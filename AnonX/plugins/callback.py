@@ -57,9 +57,9 @@ async def del_back_playlist(client, CallbackQuery, _):
         )
     except:
         return
-    if chat_id not in checker:
-        checker[chat_id] = {}
-    checker[chat_id][CallbackQuery.message.message_id] = True
+    if chat_id not in wrong:
+        wrong[chat_id] = {}
+    wrong[chat_id][CallbackQuery.message.message_id] = True
 
 
 @app.on_callback_query(filters.regex("unban_assistant"))
@@ -438,7 +438,7 @@ async def markup_timer():
                 except:
                     continue
                 try:
-                    check = checker[chat_id][mystic.message_id]
+                    check = wrong[chat_id][mystic.message_id]
                     if check is False:
                         continue
                 except:
