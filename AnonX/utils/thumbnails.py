@@ -8,7 +8,7 @@ import numpy as np
 
 from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFilter, ImageFont
 from youtubesearchpython.__future__ import VideosSearch
-
+import random
 from config import YOUTUBE_IMG_URL
 from AnonX import app
 
@@ -30,6 +30,15 @@ def add_corners(im):
     mask = ImageChops.darker(mask, im.split()[-1])
     im.putalpha(mask)
 
+def check_neon_color():
+    colors = [
+        (253, 0, 255),  # Neon Pink
+        (0, 253, 255),  # Neon Blue
+        (0, 255, 2),  # Neon Green
+        (255, 238, 0),  # Neon Yellow
+        (255, 0, 0),  # Neon Red
+    ]
+    return random.choice(colors)
 
 async def gen_thumb(videoid, user_id):
     if os.path.isfile(f"cache/{videoid}_{user_id}.png"):
@@ -82,7 +91,12 @@ async def gen_thumb(videoid, user_id):
         x = f.resize((107, 107))
 
         youtube = Image.open(f"cache/thumb{videoid}.png")
-        bg = Image.open(f"AnonX/assets/anonx.png")
+        bg = Image.open(f"AnonX/assets/anonx.png").convert("RGBA")
+        r, g, b, a = bg.split()
+        bg = Image.merge("RGB", (r, g, b))
+        bg = bg.filter(ImageFilter.GaussianBlur(radius=3))
+        neon_color = check_neon_color()
+        bg = ImageOps.colorize(bg.convert("L"), neon_color, (0, 0, 0))
         image1 = changeImageSize(1280, 720, youtube)
         image2 = image1.convert("RGBA")
         background = image2.filter(filter=ImageFilter.BoxBlur(30))
@@ -311,3 +325,4 @@ async def gen_qthumb(videoid, user_id):
     except Exception as e:
         print(e)
         return YOUTUBE_IMG_URL
+        
